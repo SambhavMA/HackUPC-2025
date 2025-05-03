@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitMatch by Inditex</title>
+    <!-- ✅ Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <script>
+    function previewImage(event) {
+      const fileInput = event.target;
+      const file = fileInput.files[0];
+      const preview = document.getElementById("imagePreview");
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+
+  <body class="bg-white text-gray-900 font-sans">
+    <div class="max-w-4xl mx-auto p-6 text-center">
+      <!-- Header -->
+      <h1 class="text-xl font-semibold mb-2">FitMatch by Inditex</h1>
+
+      <!-- Intro -->
+      <h2 class="text-2xl font-bold mb-2">Hi there !</h2>
+      <p class="text-xl font-semibold">
+        Spotted a piece you love? Let’s style the whole look.
+      </p>
+      <p class="text-gray-600 mb-6">
+        Upload a photo or paste a link? We’ll build a full outfit with matching
+        vibes from Zara, Bershka, Oysho & more.
+      </p>
+
+      <!-- Upload section -->
+      <div class="flex flex-col items-center gap-4 mb-10">
+        <!-- Row: Input and Upload Button -->
+        <div class="flex items-center justify-center gap-2 w-full">
+          <input
+            type="text"
+            placeholder="Paste a product link or upload a photo"
+            class="w-full max-w-md px-4 py-2 border border-gray-400 rounded-full"
+          />
+          <label
+            for="fileUpload"
+            class="cursor-pointer bg-green-900 text-white px-6 py-2 rounded-full hover:bg-green-800 transition inline-flex items-center gap-2"
+          >
+            <!-- Upload icon (Heroicons) -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.5 12.75l7.5-7.5 7.5 7.5M12 5.25v13.5"
+              />
+            </svg>
+            Upload picture
+          </label>
+          <input
+            type="file"
+            id="fileUpload"
+            accept="image/*"
+            class="hidden"
+            onchange="previewImage(event)"
+          />
+        </div>
+
+        <!-- Image preview -->
+        <img
+          id="imagePreview"
+          class="mt-4 w-64 h-64 object-cover rounded-lg border border-gray-300 hidden"
+          alt="Uploaded preview"
+        />
+      </div>
+
+      <!-- Styled Outfit Section -->
+      <h3 class="text-2xl font-semibold mb-6">
+        Here’s a full outfit we styled for you.
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Product 1 -->
+        <a href="#" class="block hover:shadow-lg transition">
+          <div class="border rounded-lg overflow-hidden shadow-sm">
+            <img
+              src="./assets/2.jpg"
+              alt="Dress"
+              class="w-full h-64 object-cover"
+            />
+            <div class="p-4 text-left">
+              <h4 class="font-bold">VESTIDO CON COLLECTION</h4>
+              <p class="text-green-700 font-semibold">69,95 EUR</p>
+              <p class="text-sm text-gray-600">Zara</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- Product 2 -->
+        <a href="#" class="block hover:shadow-lg transition">
+          <div class="border rounded-lg overflow-hidden shadow-sm">
+            <img
+              src="./assets/3.jpg"
+              alt="Dress"
+              class="w-full h-64 object-cover"
+            />
+            <div class="p-4 text-left">
+              <h4 class="font-bold">SANDALIA ADORNO PIEL</h4>
+              <p class="text-green-700 font-semibold">49,95 EUR</p>
+              <p class="text-sm text-gray-600">Zara</p>
+            </div>
+          </div>
+        </a>
+        <!-- Product 3 -->
+        <a href="#" class="block hover:shadow-lg transition">
+          <div class="border rounded-lg overflow-hidden shadow-sm">
+            <img
+              src="./assets/4.jpg"
+              alt="Dress"
+              class="w-full h-64 object-cover"
+            />
+            <div class="p-4 text-left">
+              <h4 class="font-bold">PACK COLLARES CHARMS</h4>
+              <p class="text-green-700 font-semibold">22,95 EUR</p>
+              <p class="text-sm text-gray-600">Zara</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
