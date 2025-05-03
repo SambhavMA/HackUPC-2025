@@ -4,3 +4,4 @@ export const OAUTH2_SECRET = "";
 export const OAUTH2_SCOPE = "";
 export const OAUTH2_ACCESSTOKEN_URL = "";
 export const PRODUCT_SEARCH_URL = "";
+export const OPENAI_API_KEY = "";
