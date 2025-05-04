@@ -2,8 +2,8 @@ const { chromium } = require('playwright');
 
 async function getLastProductImage(url) {
   const browser = await chromium.launch({
-    //headless: false,   // modo visible para depurar
-    //slowMo: 1000,      // 1 s de pausa entre cada acción
+    headless: true,   // modo visible para depurar
+    slowMo: 1000,      // 1 s de pausa entre cada acción
     devtools: true     // abre DevTools
   });
 
@@ -37,4 +37,4 @@ async function getLastProductImage(url) {
   await browser.close();
 }
 
-getLastProductImage('https://www.zara.com/es/en/soft-button-coat-p05070660.html');
+getLastProductImage('https://zara.com/es/en/-P16633510.html?v1=433536738');
