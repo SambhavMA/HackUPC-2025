@@ -37,6 +37,66 @@ async function getJWT() {
   }
 }
 
+async function searchProducts(item, JWT_TOKEN) {
+  try {
+    // Extract brand and search query
+    const brand = item.toLowerCase().includes('zara') ? 'zara' : 
+                 item.toLowerCase().includes('massimo duti') ? 'massimo duti' : 
+                 item.toLowerCase().includes('pull & bear') ? 'pull & bear' : 'zara';
+    
+    // Remove brand name from search query
+    const searchQuery = item.replace(/zara|massimo duti|pull & bear/gi, '').trim();
+    
+    const searchUrl = `https://api.inditex.com/searchpmpa/products?query=${encodeURIComponent(searchQuery)}&brand=${encodeURIComponent(brand)}`;
+    
+    const searchResponse = await axios({
+      method: 'get',
+      url: searchUrl,
+      headers: {
+        'User-Agent': 'OpenPlatform/1.0',
+        'Authorization': `Bearer ${JWT_TOKEN}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (searchResponse.data && searchResponse.data.length > 0) {
+      const firstResult = searchResponse.data[0];
+      return {
+        name: firstResult.name,
+        price: firstResult.price,
+        link: firstResult.link,
+        brand: firstResult.brand
+      };
+    } else {
+      return { error: 'No results found' };
+    }
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+async function getOutfitSuggestion(product_name, brandsString, openai) {
+  const query = "suggest one casual outfit from brands " + brandsString + " with " + product_name + " as the main item, brand Zara. Do not output anything else besides the result, which is in the format \"[first item in the fit, second item in the fit, 3rd item in the fit, ...]\", for example: [\"ZW COLLECTION CROP POPLIN SHIRT\", \"Zara white blouse\", \"Zara black shoes\"]";
+  
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "user", content: query }
+      ],
+      temperature: 0.7,
+    });
+
+    console.log(`\nOutfit suggestion for ${product_name}:`);
+    const outfitSuggestion = JSON.parse(completion.choices[0].message.content);
+    console.log(outfitSuggestion);
+    return outfitSuggestion;
+  } catch (error) {
+    console.error(`Error getting outfit suggestion for ${product_name}:`, error.message);
+    throw error;
+  }
+}
+
 async function main() {
   const JWT_TOKEN = await getJWT();
   try {
@@ -59,29 +119,39 @@ async function main() {
   }
 
   var product_names = response.data.map(product => product.name);
-  console.log(product_names);
+
+  // Get the first n products to not overwhelm the OpenAI API
+  var shortened_product_names = product_names.slice(0, 1);
+  console.log("First 2 products:", shortened_product_names);
 
   // Initialize OpenAI client
   const openai = new OpenAI({
     apiKey: OPENAI_API_KEY
   });
 
-  for (const product_name of product_names) {
-    const query = "suggest one casual outfit from brands Massimo Duti, Pull & Bear and Zara with " + product_name + " as the main item, brand Zara. Do not output anything else besides the result, which is in the format \"[first item in the fit, second item in the fit, 3rd item in the fit, ...]\", for example: [\"ZW COLLECTION CROP POPLIN SHIRT\", \"Zara white blouse\", \"Zara black shoes\", \"Zara braclet\"]";
-
+  // Massimo Duti, Pull & Bear and Zara
+  const brands = ["Zara"];
+  const brandsString = brands.join(", ");
+  for (const product_name of shortened_product_names) {
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "user", content: query }
-        ],
-        temperature: 0.7,
-      });
+      const outfitSuggestion = await getOutfitSuggestion(product_name, brandsString, openai);
 
-      console.log(`\nOutfit suggestion for ${product_name}:`);
-      console.log(completion.choices[0].message.content);
+      // Search for each item in the outfit
+      const searchPromises = outfitSuggestion.map(item => searchProducts(item, JWT_TOKEN));
+
+      // Wait for all searches to complete
+      const searchResults = await Promise.all(searchPromises);
+      
+      // Create the final outfit suggestion with product details
+      const outfitWithProducts = {
+        mainItem: product_name,
+        outfitSuggestion: outfitSuggestion,
+        products: searchResults
+      };
+
+      console.log(JSON.stringify(outfitWithProducts, null, 2));
     } catch (error) {
-      console.error(`Error getting outfit suggestion for ${product_name}:`, error.message);
+      console.error(`Error processing outfit for ${product_name}:`, error.message);
     }
   }
 }
