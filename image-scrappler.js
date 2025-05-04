@@ -2,8 +2,8 @@ const { chromium } = require('playwright');
 
 async function getLastProductImage(url) {
   const browser = await chromium.launch({
-    headless: false,   // modo visible para depurar
-    slowMo: 1000,      // 1 s de pausa entre cada acción
+    //headless: false,   // modo visible para depurar
+    //slowMo: 1000,      // 1 s de pausa entre cada acción
     devtools: true     // abre DevTools
   });
 
